@@ -238,6 +238,19 @@ class RiakPbcTransport(RiakTransport):
 
         return keys
 
+    def get_buckets(self):
+        """
+        Serialize bucket listing request and deserialize response
+        """
+        req = riakclient_pb2.RpbListBucketsReq()
+
+        self.maybe_connect()
+        self.send_msg(MSG_CODE_LIST_KEYS_REQ, req)
+        msg_code, resp = self.recv_msg()
+        if msg_code != MSG_CODE_LIST_BUCKETS_RESP:
+          raise RiakError("unexpected protocol buffer message code: ", msg_code)
+        return resp.buckets
+
     def get_bucket_props(self, bucket):
         """
         Serialize bucket property request and deserialize response
